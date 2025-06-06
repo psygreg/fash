@@ -3,7 +3,7 @@ Fast BASH: a bash library for complex bash scripting.
 
 ## Usage
 
-You may download `fash.lib` and modify it as needed. It is encouraged, if you make an addition that could have widespread usage outside of your scripts and applications, that you contribute to upstream.
+You may download `fash.lib` and modify it as needed. It is encouraged, if you make an addition that could have widespread usage outside of your scripts and applications, that you contribute to upstream. Summon its functionalities, as usual in bash, by the command `source /path/to/fash.lib`.
 
 ## Features
 
