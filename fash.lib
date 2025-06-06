@@ -1,0 +1,182 @@
+## fash library
+. /etc/os-release
+
+# whiptail color palette
+export NEWT_COLORS='
+    root=white,blue
+    border=black,lightgray
+    window=black,lightgray
+    shadow=black,gray
+    title=black,lightgray
+    button=black,cyan
+    actbutton=white,blue
+    checkbox=black,lightgray
+    actcheckbox=black,cyan
+    entry=black,lightgray
+    label=black,lightgray
+    listbox=black,lightgray
+    actlistbox=black,cyan
+    textbox=black,lightgray
+    acttextbox=black,cyan
+    helpline=white,blue
+    roottext=black,lightgray
+'
+
+# logger -- define variable 'logfile' as the full path to log file
+_log_ () {
+
+    exec 2> >(tee "$logfile" >&2)
+
+}
+
+# native package installation
+_install_ () {
+    
+    if [[ -n "$_packages" ]]; then
+        if [[ "$ID_LIKE" =~ (ubuntu|debian) ]] || [ "$ID" == "debian" ]; then
+            for pak in "${_packages[@]}"; do
+                if [[ "$pak" =~ ^(list|exceptions|here)$ ]]; then
+                    continue
+                fi
+                if dpkg -s "$pak" 2>/dev/null 1>&2; then
+                    continue
+                else
+                    sudo apt install -y $pak
+                fi
+            done
+        elif [[ "$ID" =~ ^(arch|cachyos)$ ]] || [[ "$ID_LIKE" == *arch* ]]; then
+            for pak in "${_packages[@]}"; do
+                if [[ "$pak" =~ ^(list|exceptions|here)$ ]]; then
+                    continue
+                fi
+                if pacman -Qi "$pak" 2>/dev/null 1>&2; then
+                    continue
+                else
+                    sudo pacman -S --noconfirm $pak
+                fi
+            done
+        elif [[ "$ID_LIKE" =~ (rhel|fedora) ]] || [[ "$ID" =~ (fedora) ]]; then
+            for pak in "${_packages[@]}"; do
+                if [[ "$pak" =~ ^(list|exceptions|here)$ ]]; then
+                    continue
+                fi
+                if rpm -qi "$pak" 2>/dev/null 1>&2; then
+                    continue
+                else
+                    sudo dnf in $pak -y
+                fi
+            done
+        elif [ "$ID_LIKE" == "suse" ] || [ "$ID" == "suse" ]; then
+            for pak in "${_packages[@]}"; do
+                if [[ "$pak" =~ ^(list|exceptions|here)$ ]]; then
+                    continue
+                fi
+                if rpm -qi "$pak" 2>/dev/null 1>&2; then
+                    continue
+                else
+                    sudo zypper in $pak -y
+                fi
+            done
+        fi
+    fi
+
+}
+
+# INSTAnt install
+if [[ "$ID_LIKE" =~ (ubuntu|debian) ]] || [ "$ID" == "debian" ]; then
+    insta () {
+        if [ "$#" -eq 0 ]; then
+            return 1
+        fi
+        sudo apt install -y "$@"
+    }
+elif [[ "$ID" =~ ^(arch|cachyos)$ ]] || [[ "$ID_LIKE" == *arch* ]]; then
+    insta () {
+        if [ "$#" -eq 0 ]; then
+            return 1
+        fi
+        sudo pacman -S --noconfirm "$@"
+    }
+elif [[ "$ID_LIKE" =~ (rhel|fedora) ]] || [ "$ID" == "fedora" ]; then
+    insta () {
+        if [ "$#" -eq 0 ]; then
+            return 1
+        fi
+        sudo dnf in "$@" -y
+    }
+elif [ "$ID_LIKE" == "suse" ] || [ "$ID" == "suse" ]; then
+    insta () {
+        if [ "$#" -eq 0 ]; then
+            return 1
+        fi
+        sudo zypper in "$@" -y
+    }
+fi
+
+# flatpak installation
+_flatpak_ () {
+
+    if [[ -n "$_flatpaks" ]]; then
+        for flat in "${_flatpaks[@]}"; do
+            flatpak install --or-update -u -y $flat
+        done
+    fi
+
+}
+
+# language detect -- add elif for each language in the last if statement
+_lang_ () {
+
+    local lang="${LANG:0:2}"
+    local available=("pt")
+    local ulang=""
+    langfile=""
+
+    if [[ " ${available[*]} " == *"$lang"* ]]; then
+        ulang="$lang"
+    else
+        ulang="en"
+    fi
+    if [ $ulang == "pt" ]; then
+        langfile="pt"
+    else
+        langfile="en"
+    fi
+
+}
+
+# subscript invoker
+_invoke_ () {
+
+    if [[ -n "$invoke" ]]; then
+        bash <(curl -s https://insert.url.here/${invoke}.sh)
+    fi
+
+}
+
+# wraps all commands in a function in sudo -- usage: _root_ function_name
+_root_ () {
+
+    if [ $# -eq 0 ]; then
+        return 1
+    fi
+
+    local cmd=("$@")
+
+    # Check if already root
+    if [ "$(id -u)" -eq 0 ]; then
+        "${cmd[@]}"
+    else
+        sudo bash -c "$(declare -f "${cmd[0]}") ; ${cmd[*]}"
+    fi
+
+}
+
+# whiptail messagebox
+_msgbox_ () {
+
+    whiptail --title "$title" --msgbox "$msg" 12 78
+
+}
+
+## non-fash functions can be added HERE
