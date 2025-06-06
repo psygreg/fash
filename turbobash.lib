@@ -1,4 +1,4 @@
-## fash library
+## turbobash library
 . /etc/os-release
 
 # whiptail color palette
@@ -179,4 +179,4 @@ _msgbox_ () {
 
 }
 
-## non-fash functions can be added HERE
+## non-turbobash functions can be added HERE
