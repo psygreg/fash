@@ -1,9 +1,9 @@
-# fash
-Fast BASH: a bash library for complex bash scripting.
+# Turbo Bash
+A bash library for complex bash scripting.
 
 ## Usage
 
-You may download `fash.lib` and modify it as needed. It is encouraged, if you make an addition that could have widespread usage outside of your scripts and applications, that you contribute to upstream. Summon its functionalities, as usual in bash, by the command `source /path/to/fash.lib`.
+You may download `turbobash.lib` and modify it as needed. It is encouraged, if you make an addition that could have widespread usage outside of your scripts and applications, that you contribute to upstream. Summon its functionalities, as usual in bash, by the command `source /path/to/turbobash.lib`.
 
 ## Features
 
@@ -53,7 +53,7 @@ Quick and easy detection that outputs a `langfile` variable. It can be extended 
 
 ### Script Invoker
 
-Can summon scripts from your repository, allowing more flexibility and quick deployment of bugfixes. Requires setting up your repository URL in the `fash.lib` file.
+Can summon scripts from your repository, allowing more flexibility and quick deployment of bugfixes. Requires setting up your repository URL in the `turbobash.lib` file.
 
     invoke="filename"
     _invoke_
@@ -67,5 +67,6 @@ Wraps a function in `sudo`.
     }
     ...
     _root_ func
+
 
 
